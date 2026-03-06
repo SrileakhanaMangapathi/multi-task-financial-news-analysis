@@ -1,0 +1,74 @@
+# ============================================================
+# Multi-Task Financial News Analysis - Config
+# ============================================================
+
+data:
+  raw_path: data/raw/
+  processed_path: data/processed/
+  headline_col: headline
+  numerical_features:
+    - Index_Change_Percent
+    - Trading_Volume
+  label_cols:
+    market_event: Market_Event
+    sentiment: Sentiment
+    impact_level: Impact_Level
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+preprocessing:
+  max_vocab_size: 30000
+  max_seq_length: 128
+  fasttext_dim: 300
+  smote: true
+  median_imputation: true
+
+training:
+  batch_size: 32
+  epochs: 20
+  early_stopping_patience: 3
+  fp16: true
+  seed: 42
+
+distilbert:
+  model_name: distilbert-base-uncased
+  max_length: 128
+  lr_base: 1e-5        # lower LR for base layers
+  lr_head: 3e-5        # higher LR for classification heads
+  event_loss_weight: 0.5
+  sentiment_loss_weight: 0.5
+  dropout: 0.3
+
+bigru:
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.3
+  learning_rate: 1e-3
+  attention_type: bahdanau   # options: bahdanau, self, none
+  num_numerical_features: 2
+
+bilstm:
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.3
+  learning_rate: 1e-3
+  attention_type: multi_head  # options: additive, multiplicative, multi_head
+  event_loss_weight: 0.5
+  sentiment_loss_weight: 0.5
+
+evaluation:
+  kfold: 5
+  metrics:
+    - macro_f1
+    - weighted_f1
+    - cohen_kappa
+    - matthews_correlation
+    - confusion_matrix
+
+paths:
+  model_save: models/saved/
+  results: results/
+  plots: results/plots/
+  metrics: results/metrics/
